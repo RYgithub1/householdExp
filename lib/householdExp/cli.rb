@@ -43,5 +43,18 @@ module HouseholdExp
         .downcase
     end
 
+    desc "oddcheck number", "answer odd or any"
+    def oddcheck(number)
+      number = number.to_i
+      if number < 0 then
+        number = number * (-1)
+      end
+      if number%2 == 1 then
+        puts 'Integer part is odd'
+      else
+        puts 'Integer part is not odd'
+      end
+    end
+
   end
 end

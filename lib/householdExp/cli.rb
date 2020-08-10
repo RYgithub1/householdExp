@@ -1,6 +1,10 @@
 require 'householdExp'
 require 'thor'
 
+# require 'nokogiri'
+require 'mechanize'
+
+
 module HouseholdExp
   class CLI < Thor
 
@@ -55,6 +59,43 @@ module HouseholdExp
         puts 'Integer part is not odd'
       end
     end
+
+    # ---------------------------
+    desc "", ""
+    def mechanize
+      agent = Mechanize.new
+      urlAuth = "https://auth.zaim.net/"
+      page = agent.get(urlAuth)
+      puts page.body
+      # elements = page.search('input')
+      # puts elements
+      # puts page.links
+      # page.links.each do |link|
+      #   puts link.text
+      #   # 下はhttpのリンク先
+      #   puts link.href
+      # end
+      # text_link = page.link_with(text: 'ログイン')
+      # puts text_link
+      # href_link = page.link_with(href: 'https://auth.zaim.net/')
+      # puts href_link
+      # ---------------
+      # # puts page.forms
+      # id_form = page.form_with(id: 'householdExpenses316@gmail.com')
+      # # page.form_with(class: 'class情報')
+
+      # id_form.field_with(name: 'data[User][email]').value = 'householdExpenses316@gmail.com'
+      # id_form.field_with(name: 'data[User][password]').value = 'expense3'
+      # # id_form.field_with(id: 'id情報').value = '入力値'
+
+      # result_form = agent.submit(id_form)
+
+      # puts result_form.body
+
+      # puts page.at_css('form')
+
+    end
+
 
   end
 end

@@ -1,29 +1,22 @@
-require 'householdExp'
-require 'thor'
-
-# require 'nokogiri'
-require 'mechanize'
+require "householdExp"
+require "thor"
+require "mechanize"
+require "nokogiri"
+require "kconv"
+require "selenium-webdriver"
 
 
 module HouseholdExp
   class CLI < Thor
 
-    # ----- make cli  first -----
+    # ----- make cli first -----
     # コマンドの使用例と概要の説明
-    desc "red WORD", "words colored by red print."
+    desc "color word1 word3 word3", "words colored by red blue green print."
     # メソッドとして定義
-    def red(word)
-      say(word, :red)
-    end
-
-    desc "blue WORD", "words colored by blue print."
-    def blue(word)
-      say(word, :blue)
-    end
-
-    desc "green WORD", "words colored by green print."
-    def green(word)
-      say(word, :green)
+    def color(word1, word2, word3)
+      say(word1, :red)
+      say(word2, :blue)
+      say(word3, :green)
     end
 
     desc "hello NAME", "say hello to NAME"
@@ -61,40 +54,31 @@ module HouseholdExp
     end
 
     # ---------------------------
-    desc "", ""
-    def mechanize
+    desc "zaim mail password yyyymm", "expenses of a month(YYYYMM)"
+    def zaims(mailZaim, passwordZaim, monthZaim)
+      # ----- インスタンス生成 ---------
       agent = Mechanize.new
+      agent.user_agent = 'Mac Safari'
+      # ----- 認証突破 ---------
       urlAuth = "https://auth.zaim.net/"
       page = agent.get(urlAuth)
-      puts page.body
-      # elements = page.search('input')
-      # puts elements
-      # puts page.links
-      # page.links.each do |link|
-      #   puts link.text
-      #   # 下はhttpのリンク先
-      #   puts link.href
-      # end
-      # text_link = page.link_with(text: 'ログイン')
-      # puts text_link
-      # href_link = page.link_with(href: 'https://auth.zaim.net/')
-      # puts href_link
-      # ---------------
-      # # puts page.forms
-      # id_form = page.form_with(id: 'householdExpenses316@gmail.com')
-      # # page.form_with(class: 'class情報')
+      id_form = page.form_with(id: 'UserLoginForm')
+      id_form.field_with(name: 'data[User][email]').value = mailZaim
+      id_form.field_with(name: 'data[User][password]').value = passwordZaim
+      result_form = agent.submit(id_form)
+      
+      # ----- 履歴突破 ---------
+      history_url = "https://zaim.net/money?month=#{monthZaim}"
+      # pageHistory = agent.get(history_url).content.toutf8
+      pageHistory = agent.get(history_url)
 
-      # id_form.field_with(name: 'data[User][email]').value = 'householdExpenses316@gmail.com'
-      # id_form.field_with(name: 'data[User][password]').value = 'expense3'
-      # # id_form.field_with(id: 'id情報').value = '入力値'
+      doc = Nokogiri::HTML(pageHistory.content.toutf8)
+  
+      doc.xpath("/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[1]/div[5]/span").each do |node|
 
-      # result_form = agent.submit(id_form)
-
-      # puts result_form.body
-
-      # puts page.at_css('form')
-
+      end
     end
+
 
 
   end

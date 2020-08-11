@@ -8,3 +8,5 @@ gem "rspec", "~> 3.0"
 
 gem "nokogiri"
 gem "mechanize"
+gem "pry-rails"
+gem "selenium-webdriver"

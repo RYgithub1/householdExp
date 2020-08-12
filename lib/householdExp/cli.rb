@@ -53,32 +53,84 @@ module HouseholdExp
       end
     end
 
-    # ---------------------------
+
+    # ==== セレニウムに変更 ==================
     desc "zaim mail password yyyymm", "expenses of a month(YYYYMM)"
-    def zaims(mailZaim, passwordZaim, monthZaim)
-      # ----- インスタンス生成 ---------
-      agent = Mechanize.new
-      agent.user_agent = 'Mac Safari'
-      # ----- 認証突破 ---------
+    def zaim(mailZaim, passwordZaim, monthZaim)
+      # インスタンス生成
+      driver = Selenium::WebDriver.for :chrome
+
+
+      # ブラウザ起動
       urlAuth = "https://auth.zaim.net/"
-      page = agent.get(urlAuth)
-      id_form = page.form_with(id: 'UserLoginForm')
-      id_form.field_with(name: 'data[User][email]').value = mailZaim
-      id_form.field_with(name: 'data[User][password]').value = passwordZaim
-      result_form = agent.submit(id_form)
-      
-      # ----- 履歴突破 ---------
-      history_url = "https://zaim.net/money?month=#{monthZaim}"
-      # pageHistory = agent.get(history_url).content.toutf8
-      pageHistory = agent.get(history_url)
+      driver.get urlAuth
+      # ログイン
+      driver.find_element(:xpath, '/html/body/div[3]/div[2]/div[1]/div[2]/form/div[2]/div/input').send_keys mailZaim
+      driver.find_element(:xpath, '/html/body/div[3]/div[2]/div[1]/div[2]/form/div[3]/div/input').send_keys passwordZaim
+      driver.find_element(:xpath, '/html/body/div[3]/div[2]/div[1]/div[2]/form/div[4]/input').click
+      sleep 1
+      # yyyymmの履歴に遷移
+      urlHistory = "https://zaim.net/money?month=#{monthZaim}"
+      driver.get urlHistory
+      sleep 1
+      puts "\n\n"
+      puts "  ∩ ∩ 　＜ 収支サマリ（#{monthZaim}）♪ ）"
+      puts "（・×・）————————————————————————————————————"
+      puts driver.find_element(:tag_name, 'table').text
+      puts "———————————————————————————————————————————"
+      sleep 1
+      puts "\n"
+      puts "\n"
+      puts "ーー 履歴ページ ーー"
 
-      doc = Nokogiri::HTML(pageHistory.content.toutf8)
-  
-      doc.xpath("/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[1]/div[5]/span").each do |node|
+      puts "【日付 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[1]/div[3]/span').text
+      puts "【ｶﾃｺﾞﾘ】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div["#{row}"]/div[4]/span[2]').text
+      puts "【金額 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div["#{row}"]/div[5]/span').text
+      puts "【出金 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div["#{row}"]/div[6]').text
+      puts "【入金 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div["#{row}"]/div[7]').text
+      puts "【お店 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div["#{row}"]/div[8]/span').text
+      puts "【品目 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div["#{row}"]/div[9]/span').text
+      puts "【メモ 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div["#{row}"]/div[10]/span').text
+      puts "\n"
+      # ーーーーーーーーーーーー
+      puts "【日付 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[2]/div[3]/span').text
+      puts "【ｶﾃｺﾞﾘ】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[2]/div[4]/span[2]').text
+      puts "【金額 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[2]/div[5]/span').text
+      puts "【出金 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[2]/div[6]').text
+      puts "【入金 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[2]/div[7]').text
+      puts "【お店 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[2]/div[8]/span').text
+      puts "【品目 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[2]/div[9]/span').text
+      puts "【メモ 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[2]/div[10]/span').text
+      puts "\n"
+      # ーーーーーーーーーーーー
+      puts "【日付 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[3]/div[3]/span').text
+      puts "【ｶﾃｺﾞﾘ】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[3]/div[4]/span[2]').text
+      puts "【金額 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[3]/div[5]/span').text
+      puts "【出金 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[3]/div[6]').text
+      puts "【入金 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[3]/div[7]').text
+      puts "【お店 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[3]/div[8]/span').text
+      puts "【品目 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[3]/div[9]/span').text
+      puts "【メモ 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[3]/div[10]/span').text
+      puts "\n"
+      # ーーーーーーーーーーーー
+      puts "【日付 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[4]/div[3]/span').text
+      puts "【ｶﾃｺﾞﾘ】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[4]/div[4]/span[2]').text
+      puts "【金額 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[4]/div[5]/span').text
+      puts "【出金 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[4]/div[6]').text
+      puts "【入金 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[4]/div[7]').text
+      puts "【お店 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[4]/div[8]/span').text
+      puts "【品目 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[4]/div[9]/span').text
+      puts "【メモ 】" + driver.find_element(:xpath, '/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[3]/div[2]/div[2]/div/div[4]/div[10]/span').text
+      puts "\n"
+    
 
-      end
+      # ブラウザ終了
+      puts "\n"
+      puts "  ∩ ∩ 　＜ ご確認頂きありがとうございます！ ）"
+      puts "（・▽・）————————————————————————————————————"
+      puts "\n"
+      driver.quit
     end
-
 
 
   end

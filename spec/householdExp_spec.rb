@@ -10,6 +10,30 @@ RSpec.describe HouseholdExp do
       end
     end
 
+    describe "cli_年月有効性" do
+      context "桁数確認" do
+        it "【right】mail/password <-> 【wrong】month（桁数6：123456789）" do
+          monthZaim = "123456789"
+          expect(monthZaim.length).not_to eq 6
+        end
+      end
+      context "年月確認" do
+        it "【right】mail/password <-> 【wrong】month（mm：1月〜12月）" do
+          monthZaim = "202099"
+          monthZaimInt = monthZaim.to_i
+          lastTwoDigits = monthZaimInt % 100
+          expect(lastTwoDigits >= 1 && lastTwoDigits <= 12).to be false
+        end
+        it "【right】mail/password <-> 【wrong】month（yyyy：0100年〜9999年）" do
+          monthZaim = "000099"
+          monthZaimInt = monthZaim.to_i
+          firstFourDigitsFloor = monthZaimInt / 100
+          firstFourDigits = firstFourDigitsFloor.floor
+          expect(firstFourDigits >= 100 && firstFourDigits).to be false
+        end
+      end
+    end
+
     describe "#cli_ログイン" do
       context "ログイン可能な場合" do
         it "【right】mail/password <-> 【wrong】" do
@@ -27,7 +51,7 @@ RSpec.describe HouseholdExp do
           driver.quit
         end
       end
-      context "ログイン不可な場合" do
+      context "ログイン不可の場合" do
         it "【right】mail <-> 【wrong】password" do
           mailZaim = "householdExpenses316@gmail.com"
           passwordWrong = "zzzzzzz3"
@@ -70,9 +94,9 @@ RSpec.describe HouseholdExp do
       end
     end
 
-    describe "#cli_履歴表示" do
-      context "入力月が有効な場合" do
-        it "【right】mail/password/month(記録有り：202008) <-> 【wrong】" do
+    describe "#cli_履歴有無" do
+      context "記録有りの場合" do
+        it "【right】mail/password/month（202008） <-> 【wrong】" do
           mailZaim = "householdExpenses316@gmail.com"
           passwordZaim = "expense3"
           monthZaim = "202008"
@@ -83,13 +107,16 @@ RSpec.describe HouseholdExp do
           driver.find_element(:xpath, '/html/body/div[3]/div[2]/div[1]/div[2]/form/div[2]/div/input').send_keys mailZaim
           driver.find_element(:xpath, '/html/body/div[3]/div[2]/div[1]/div[2]/form/div[3]/div/input').send_keys passwordZaim
           driver.find_element(:xpath, '/html/body/div[3]/div[2]/div[1]/div[2]/form/div[4]/input').click
+          sleep 1
           urlHistory = "https://zaim.net/money?month=#{monthZaim}"
           driver.get urlHistory
-          sleep 2
+          sleep 1
           expect(driver.find_element(:xpath, "/html/body/div[2]/div[2]/div[1]/div[3]/div/div[2]/div[1]").text).to eq isLogText
           driver.quit
         end
-        it "【right】mail/password/month(記録無し：202007) <-> 【wrong】" do
+      end
+      context "記録無しの場合" do
+        it "【right】mail/password/month（202007） <-> 【wrong】" do
           mailZaim = "householdExpenses316@gmail.com"
           passwordZaim = "expense3"
           monthZaim = "202007"
@@ -101,18 +128,11 @@ RSpec.describe HouseholdExp do
           driver.find_element(:xpath, '/html/body/div[3]/div[2]/div[1]/div[2]/form/div[3]/div/input').send_keys passwordZaim
           driver.find_element(:xpath, '/html/body/div[3]/div[2]/div[1]/div[2]/form/div[4]/input').click
           urlHistory = "https://zaim.net/money?month=#{monthZaim}"
+          sleep 1
           driver.get urlHistory
-          sleep 2
+          sleep 1
           expect(driver.find_element(:class, 'HistorySearch-module__bodyArea___3AbtF').text).to eq noLogText
           driver.quit
-        end
-      end
-      context "入力月が無効な場合" do
-        it "【right】mail/password <-> 【wrong】month(桁：123456789)" do
-    
-        end
-        it "【right】mail/password <-> 【wrong】month(年月：777777)" do
-        
         end
       end
     end

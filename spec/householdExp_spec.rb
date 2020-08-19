@@ -95,7 +95,7 @@ RSpec.describe HouseholdExp do
     end
 
     describe "#cli_履歴有無" do
-      context "記録有りの場合" do
+      context "記録有りの場合" do
         it "【right】mail/password/month（202008） <-> 【wrong】" do
           mailZaim = "householdExpenses316@gmail.com"
           passwordZaim = "expense3"
